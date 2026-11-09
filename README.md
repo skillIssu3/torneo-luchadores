@@ -17,21 +17,26 @@ No necesitas permisos en la organización: trabajas desde **tu propia copia (for
    ```
    git checkout -b mi-luchador
    ```
-4. Copia tu luchador de `ejercicios-equipo/miembros/` a `luchadores/`, **con tu usuario de GitHub en minúsculas** como nombre de archivo (por ejemplo `luchadores/beltza07.py`). Opcionalmente añade una línea `EMOJI = "🐉"` para elegir tu figura (mira `luchadores/_plantilla.py`).
+4. Copia tu luchador de `ejercicios-equipo/miembros/` a esta carpeta, **con tu usuario de GitHub en minúsculas** como nombre de archivo. Por ejemplo, si tu archivo era `ana.py` y tu usuario es `beltza07`:
+   ```
+   cp ../ejercicios-equipo/miembros/ana.py luchadores/beltza07.py
+   ```
+   Opcionalmente, añade al final una línea `EMOJI = "🐉"` para elegir tu figura (mira `luchadores/_plantilla.py`).
 5. Sube tu rama a tu fork y abre el Pull Request:
    ```
    git add luchadores/tuusuario.py
    git commit -m "Añado a tuusuario al torneo"
    git push -u origin mi-luchador
    ```
-   En GitHub pulsa **Compare & pull request**. Debe aparecer una ✅ verde (la validación automática). Si sale una ❌, entra en *Details* y lee qué falla.
+   En GitHub pulsa **Compare & pull request**. La validación automática pone una ✅ verde (a veces tarda hasta que un organizador la aprueba). Si sale una ❌, entra en *Details* y lee qué falla.
 
 Reglas: solo se admite **un archivo** `luchadores/tuusuario.py`, con valores directos (sin código). VIDA máx. 30, ATAQUE máx. 8.
 
 ## Para organizar
 
-- **Ajustes únicos** del repo: *Settings > Pages > Source: GitHub Actions*, y proteger `main` (*Settings > Branches*: exigir Pull Request y que pase la comprobación **validar**).
-- Cada PR con ✅: **Merge pull request**. Al hacer merge, la web se regenera sola en 1-2 minutos.
+- **Ajuste recomendado (una vez):** *Settings > Actions > General > Fork pull request workflows from outside collaborators* > «Require approval for first-time contributors who are new to GitHub». Las cuentas nuevas necesitarán que pulséis **Approve and run workflows** en su PR. Es normal.
+- Activar Pages una vez: *Settings > Pages > Source: GitHub Actions*.
+- Haced merge solo de los PR con ✅ (*Merge pull request*). Al hacer merge, la web se regenera sola en 1-2 minutos.
 - En directo: abre la web, **Espacio** o clic avanza el texto, **A** activa el modo automático, **F** pantalla completa.
 - Si algo va mal, en local: `python3 tools/build.py && python3 -m http.server -d docs` y abre `http://localhost:8000`.
 - Con menos de 2 luchadores válidos, la web muestra luchadores de ejemplo (modo demo).

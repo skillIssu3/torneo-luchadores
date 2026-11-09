@@ -39,7 +39,7 @@ No necesitas permisos en la organización: trabajas desde **tu propia copia (for
    ```
    En GitHub pulsa **Compare & pull request**. La validación automática pone una ✅ verde (a veces tarda hasta que un organizador la aprueba). Si sale una ❌, entra en *Details* y lee qué falla.
 
-Reglas: solo se admite **un archivo** `luchadores/tuusuario.py`, con valores directos (sin código). VIDA máx. 30, ATAQUE máx. 8.
+Reglas: el PR solo puede cambiar **un archivo**, `luchadores/tuusuario.py` (tu usuario de GitHub en minúsculas), con valores directos (sin código). VIDA máx. 30, ATAQUE máx. 8. La validación rechaza otro nombre de archivo o tocar el luchador de otra persona.
 
 ## Para organizar
 
@@ -53,6 +53,6 @@ Reglas: solo se admite **un archivo** `luchadores/tuusuario.py`, con valores dir
 ## Cómo funciona
 
 - `tools/build.py` lee `luchadores/*.py` **sin ejecutarlos** (solo valores literales) y genera `docs/luchadores.json`.
-- `.github/workflows/validar.yml` comprueba cada PR: que solo toque `luchadores/` y que el luchador sea válido. No usa secretos.
+- `.github/workflows/validar.yml` comprueba cada PR: que cambie un único archivo, `luchadores/<usuario del autor>.py` (añadirlo o editar el propio, nunca borrar ni tocar el de otra persona), y que el luchador sea válido. No usa secretos.
 - `.github/workflows/pages.yml` regenera el JSON y publica `docs/` en cada cambio de `main`.
 - `docs/index.html` es toda la web (HTML + JS, sin dependencias). Los nombres y gritos se muestran como texto, nunca como HTML.

@@ -15,14 +15,20 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Solo se puede tocar luchadores/
+      - name: Solo tu propio archivo luchadores/tuusuario.py
+        env:
+          AUTOR: ${{ github.event.pull_request.user.login }}
         run: |
-          cambios=$(git diff --name-only HEAD^1 HEAD)
+          autor=$(echo "$AUTOR" | tr 'A-Z' 'a-z')
+          cambios=$(git diff --name-status --no-renames HEAD^1 HEAD)
           echo "$cambios"
-          malos=$(echo "$cambios" | grep -v -E '^luchadores/[a-z0-9-]+\.py$' || true)
-          if [ -n "$malos" ]; then
-            echo "::error::Este PR toca archivos que no son luchadores:"
-            echo "$malos"
+          if [ "$(echo "$cambios" | wc -l)" -ne 1 ]; then
+            echo "::error::El PR debe cambiar exactamente un archivo: luchadores/$autor.py"
+            exit 1
+          fi
+          if [ "$cambios" != "$(printf 'A\tluchadores/%s.py' "$autor")" ] && \
+             [ "$cambios" != "$(printf 'M\tluchadores/%s.py' "$autor")" ]; then
+            echo "::error::El archivo debe llamarse luchadores/$autor.py (tu usuario de GitHub en minúsculas) y solo se puede añadir o editar el tuyo."
             exit 1
           fi
       - name: Validar los luchadores

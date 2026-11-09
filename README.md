@@ -17,12 +17,20 @@ No necesitas permisos en la organización: trabajas desde **tu propia copia (for
    ```
    git checkout -b mi-luchador
    ```
-4. Copia tu luchador de `ejercicios-equipo/miembros/` a esta carpeta, **con tu usuario de GitHub en minúsculas** como nombre de archivo. Por ejemplo, si tu archivo era `ana.py` y tu usuario es `beltza07`:
+4. Trae lo último de `ejercicios-equipo`, para que tu luchador lleve su grito de guerra (el de la Ronda 2):
+   ```
+   cd ../ejercicios-equipo
+   git checkout main
+   git pull
+   cd ../torneo-luchadores
+   ```
+   (Los dos repos tienen que estar en la misma carpeta, por ejemplo `~/git`.)
+5. Copia tu luchador de `ejercicios-equipo/miembros/` a esta carpeta, **con tu usuario de GitHub en minúsculas** como nombre de archivo. Por ejemplo, si tu archivo era `ana.py` y tu usuario es `beltza07`:
    ```
    cp ../ejercicios-equipo/miembros/ana.py luchadores/beltza07.py
    ```
    Opcionalmente, añade al final una línea `EMOJI = "🐉"` para elegir tu figura (mira `luchadores/_plantilla.py`).
-5. Sube tu rama a tu fork y abre el Pull Request:
+6. Sube tu rama a tu fork y abre el Pull Request:
    ```
    git add luchadores/tuusuario.py
    git commit -m "Añado a tuusuario al torneo"

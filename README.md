@@ -21,7 +21,8 @@ No necesitas permisos en la organización: trabajas desde **tu propia copia (for
    ```
    cd ../ejercicios-equipo
    git checkout main
-   git pull
+   git fetch
+   git merge origin/main
    cd ../torneo-luchadores
    ```
    (Los dos repos tienen que estar en la misma carpeta, por ejemplo `~/git`.)

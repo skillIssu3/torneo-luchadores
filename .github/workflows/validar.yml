@@ -1,0 +1,29 @@
+name: Validar luchador
+
+# Se ejecuta en cada Pull Request. No usa secretos y no ejecuta el código de los
+# archivos recibidos: solo los lee como texto.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Solo se puede tocar luchadores/
+        run: |
+          cambios=$(git diff --name-only HEAD^1 HEAD)
+          echo "$cambios"
+          malos=$(echo "$cambios" | grep -v -E '^luchadores/[a-z0-9-]+\.py$' || true)
+          if [ -n "$malos" ]; then
+            echo "::error::Este PR toca archivos que no son luchadores:"
+            echo "$malos"
+            exit 1
+          fi
+      - name: Validar los luchadores
+        run: python3 tools/build.py --check

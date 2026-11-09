@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Torneo de luchadores · 0xDecode</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --marco:#1b1b2f; --pantalla:#e9f1d2; --tinta:#1b1b2f; --verde:#22c55e; --ambar:#f5b700; --rojo:#e5383b; --lila:#b388ff;
+    --pixel:'Press Start 2P','Courier New',monospace; --texto:'VT323','Courier New',monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%;background:var(--marco);overflow:hidden}
+  body{display:flex;align-items:center;justify-content:center;font-family:var(--texto);color:var(--tinta);user-select:none}
+  #escala{width:960px;height:540px;flex:none;transform-origin:center center}
+  #pantalla{position:relative;width:960px;height:540px;background:var(--pantalla);border:6px solid #0b0b17;overflow:hidden;image-rendering:pixelated}
+  section{position:absolute;inset:0;padding:28px 36px}
+  [hidden]{display:none!important}
+  h1,h2{font-family:var(--pixel);line-height:1.4}
+  h1{font-size:30px}
+  h2{font-size:22px}
+  .sub{font-size:30px;margin-top:6px}
+  .pista{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:24px;opacity:.7}
+  button{font-family:var(--pixel);font-size:16px;padding:12px 18px;background:var(--tinta);color:var(--pantalla);border:0;border-bottom:5px solid #000;cursor:pointer}
+  button:hover{background:#2c2c4d}
+  button.sec{background:transparent;color:var(--tinta);border:3px solid var(--tinta);border-bottom-width:5px}
+  .fila{display:flex;gap:14px;align-items:center;margin-top:16px}
+
+  /* Inicio */
+  #plantel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px;max-height:250px;overflow:hidden}
+  .ficha{background:#fff;border:3px solid var(--tinta);padding:4px 8px;font-size:22px;line-height:1.05;display:flex;gap:8px;align-items:center;overflow:hidden;white-space:nowrap}
+  .ficha b{font-size:30px;font-weight:400}
+  .ficha span{overflow:hidden;text-overflow:ellipsis}
+  .ficha small{display:block;font-size:18px;opacity:.7}
+
+  /* Llaves */
+  #lista{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+  .duelo{background:#fff;border:3px solid var(--tinta);padding:6px 10px;display:flex;align-items:center;justify-content:space-between;font-size:26px;gap:8px}
+  .duelo .lado{display:flex;align-items:center;gap:6px;min-width:0;flex:1;overflow:hidden;white-space:nowrap}
+  .duelo .lado span{overflow:hidden;text-overflow:ellipsis}
+  .duelo .vs{font-family:var(--pixel);font-size:12px;opacity:.6}
+  .duelo .gana{background:var(--verde);padding:0 6px}
+  .duelo .pierde{opacity:.4;text-decoration:line-through}
+  .duelo.actual{outline:5px solid var(--ambar)}
+  .duelo.bye{background:#eee;justify-content:center;opacity:.8}
+
+  /* Combate */
+  #combate{padding:0;background:linear-gradient(#bfe3ff 0 48%,#9bd48a 48% 100%)}
+  #combate::before{content:"";position:absolute;left:0;right:0;top:48%;height:6px;background:#7fb86f}
+  .sprite{position:absolute;font-size:130px;line-height:1;transition:transform .15s,opacity .4s;filter:drop-shadow(0 10px 0 rgba(0,0,0,.18))}
+  #sprA{left:90px;top:170px;font-size:150px}
+  #sprB{right:110px;top:36px}
+  .caja{position:absolute;background:#fffbe8;border:5px solid var(--tinta);border-radius:6px 20px 6px 20px;padding:8px 14px;width:350px}
+  .caja .n{font-family:var(--pixel);font-size:14px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .barra{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .barra i{font-family:var(--pixel);font-size:11px;font-style:normal}
+  .barra div{flex:1;height:16px;background:#444;border:3px solid var(--tinta);border-radius:8px;overflow:hidden}
+  .barra div b{display:block;height:100%;width:100%;background:var(--verde);transition:width .6s steps(12),background .3s}
+  .barra div b.med{background:var(--ambar)} .barra div b.baja{background:var(--rojo)}
+  .caja .pv{text-align:right;font-size:24px;line-height:1}
+  #cajaB{left:28px;top:28px} #cajaA{right:28px;top:276px}
+  #cuadro{position:absolute;left:0;right:0;bottom:0;height:130px;background:var(--tinta);padding:10px}
+  #cuadro div.in{height:100%;background:#fffbe8;border:4px solid #8a8aa8;border-radius:6px;padding:8px 18px;font-size:34px;line-height:1.1;position:relative;overflow:hidden}
+  #flecha{position:absolute;right:16px;bottom:6px;font-size:26px;animation:pa 0.7s steps(2) infinite}
+  @keyframes pa{50%{opacity:0}}
+  .golpe{animation:sacude .35s}
+  @keyframes sacude{20%{transform:translateX(-14px);filter:brightness(2)}40%{transform:translateX(12px)}60%{transform:translateX(-8px);filter:brightness(2)}}
+  .cae{transform:translateY(90px) rotate(20deg);opacity:0}
+  #aviso{position:absolute;right:10px;top:8px;font-size:22px;opacity:.75}
+
+  /* Campeón */
+  #campeon{text-align:center;background:radial-gradient(circle,#fff3a6,#f5b700 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+  #campeon .gran{font-size:170px;line-height:1.1;animation:salto 1s infinite alternate}
+  @keyframes salto{to{transform:translateY(-18px)}}
+  #campeon .frase{font-size:34px;max-width:760px}
+</style>
+</head>
+<body>
+<div id="escala"><div id="pantalla">
+
+  <section id="s-inicio">
+    <h1>TORNEO DE<br>LUCHADORES</h1>
+    <p class="sub" id="estado">Cargando luchadores…</p>
+    <div id="plantel"></div>
+    <div class="fila">
+      <button id="btn-empezar">▶ EMPEZAR</button>
+      <button id="btn-auto" class="sec">AUTO: NO</button>
+    </div>
+    <p class="pista">Espacio / clic = avanzar · A = automático · F = pantalla completa</p>
+  </section>
+
+  <section id="s-llaves" hidden>
+    <h2 id="ronda-titulo">RONDA 1</h2>
+    <p class="sub" id="ronda-sub"></p>
+    <div id="lista"></div>
+    <p class="pista" id="llaves-pista">Espacio = siguiente combate</p>
+  </section>
+
+  <section id="combate" hidden>
+    <div class="caja" id="cajaB"><div class="n" id="nB"></div><div class="barra"><i>PV</i><div><b id="hpB"></b></div></div><div class="pv" id="pvB"></div></div>
+    <div class="sprite" id="sprB"></div>
+    <div class="sprite" id="sprA"></div>
+    <div class="caja" id="cajaA"><div class="n" id="nA"></div><div class="barra"><i>PV</i><div><b id="hpA"></b></div></div><div class="pv" id="pvA"></div></div>
+    <div id="aviso"></div>
+    <div id="cuadro"><div class="in"><span id="texto"></span><span id="flecha" hidden>▼</span></div></div>
+  </section>
+
+  <section id="s-campeon" hidden>
+    <div id="campeon" style="position:absolute;inset:0;padding:28px">
+      <h2>¡CAMPEÓN DEL TORNEO!</h2>
+      <div class="gran" id="c-emoji"></div>
+      <h1 id="c-nombre"></h1>
+      <p class="frase" id="c-grito"></p>
+      <div class="fila"><button id="btn-otra">↻ OTRO TORNEO</button></div>
+    </div>
+  </section>
+
+</div></div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const rapido = params.has("rapido");           // ?rapido -> para probar, sin esperas
+let auto = rapido, vel = rapido ? 0.04 : 1;
+
+const EMOJIS = ["🐉","🦁","🐺","🦊","🐯","🦅","🐻","🦈","🐙","🦂","🐲","🦍","🐗","🦏","🦖","🐊","🦇","🐍","🦉","🐘","🦬","🐅","🐆","🦄"];
+const DEMO = [
+  {autor:"demo1",nombre:"Ana la Rápida",vida:20,ataque:5,grito:"¡Nadie me gana!",emoji:"🦊"},
+  {autor:"demo2",nombre:"Jon el Bestia",vida:30,ataque:8,grito:"¡Aúpa Athletic!",emoji:"🦍"},
+  {autor:"demo3",nombre:"María Mazo",vida:24,ataque:6,grito:"A por ellos.",emoji:"🐉"},
+  {autor:"demo4",nombre:"Kepa Bug",vida:18,ataque:7,grito:"Funciona en mi máquina.",emoji:"🦂"},
+  {autor:"demo5",nombre:"Nerea Root",vida:22,ataque:5,grito:"sudo ganar",emoji:"🐙"}
+];
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const azar = n => Math.floor(Math.random() * n);
+const barajar = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = azar(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+function emojiDe(l){ if (l.emoji) return l.emoji; let h = 0; for (const c of l.autor + l.nombre) h = (h * 31 + c.codePointAt(0)) >>> 0; return EMOJIS[h % EMOJIS.length]; }
+
+/* ---------- Escalado a la pantalla (para proyector) ---------- */
+function escalar(){ const k = Math.min(innerWidth / 960, innerHeight / 540); $("escala").style.transform = `scale(${k})`; }
+addEventListener("resize", escalar); escalar();
+
+/* ---------- Avance con teclado / clic ---------- */
+let typing = false, terminar = null, esperando = null;
+function avanzar(){
+  if (typing && terminar) terminar();
+  else if (esperando){ const w = esperando; esperando = null; $("flecha").hidden = true; w(); }
+}
+addEventListener("keydown", e => {
+  if (e.code === "Space" || e.key === "Enter"){ e.preventDefault(); avanzar(); }
+  else if (e.key === "a" || e.key === "A") alternarAuto();
+  else if (e.key === "f" || e.key === "F"){ document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+});
+$("pantalla").addEventListener("click", e => { if (e.target.tagName !== "BUTTON") avanzar(); });
+function alternarAuto(){ auto = !auto; $("btn-auto").textContent = "AUTO: " + (auto ? "SÍ" : "NO"); $("aviso").textContent = auto ? "AUTO" : ""; if (auto) avanzar(); }
+$("btn-auto").onclick = alternarAuto;
+
+function pausa(ms){ // espera automática o a que se pulse
+  return new Promise(res => { if (auto) setTimeout(res, ms * vel); else esperando = res; });
+}
+
+function mostrar(id){ for (const s of ["s-inicio","s-llaves","combate","s-campeon"]) $(s).hidden = s !== id; }
+
+/* ---------- Texto que se escribe letra a letra ---------- */
+function decir(txt){
+  return new Promise(resolve => {
+    const caja = $("texto"); let i = 0; typing = true; $("flecha").hidden = true; caja.textContent = "";
+    const fin = () => {
+      if (!typing) return; typing = false; clearInterval(t); terminar = null; caja.textContent = txt;
+      if (auto){ setTimeout(resolve, 1000 * vel); } else { $("flecha").hidden = false; esperando = resolve; }
+    };
+    const t = setInterval(() => { i++; caja.textContent = txt.slice(0, i); if (i >= txt.length) fin(); }, 24 * vel);
+    terminar = fin;
+  });
+}
+
+/* ---------- Combate por turnos ---------- */
+const GOLPES = ["Golpe","Embestida","Patada","Cabezazo","Puñetazo","Mordisco","Zarpazo","Placaje"];
+function pintarPV(lado, l){
+  const pct = Math.max(0, l.pv) / l.vida * 100, b = $("hp" + lado);
+  b.style.width = pct + "%"; b.className = pct < 25 ? "baja" : pct < 50 ? "med" : "";
+  $("pv" + lado).textContent = `${Math.max(0, l.pv)}/${l.vida}`;
+}
+function montar(a, b){
+  for (const [lado, l] of [["A", a], ["B", b]]){
+    $("n" + lado).textContent = l.nombre; $("spr" + lado).textContent = emojiDe(l);
+    $("spr" + lado).className = "sprite"; pintarPV(lado, l);
+  }
+}
+async function animar(id, clase, ms){ const el = $(id); el.classList.add(clase); await sleep(ms * vel + 1); el.classList.remove(clase); }
+
+async function combate(a, b){
+  a.pv = a.vida; b.pv = b.vida; mostrar("combate"); montar(a, b);
+  await decir(`¡Combate! ${a.nombre} contra ${b.nombre}.`);
+  for (const l of [a, b]) if (l.grito) await decir(`${l.nombre}: «${l.grito}»`);
+  let turno = azar(2);
+  const lado = l => l === a ? "A" : "B";
+  for (;;){
+    const atk = turno ? b : a, def = turno ? a : b;
+    await decir(`¡${atk.nombre} usa ${GOLPES[azar(GOLPES.length)]}!`);
+    if (azar(10) === 0){ await decir("¡Pero falla!"); }
+    else {
+      let dano = 1 + azar(atk.ataque), crit = azar(8) === 0; if (crit) dano *= 2;
+      await animar("spr" + lado(atk), "golpe", 200);
+      def.pv -= dano; pintarPV(lado(def), def);
+      await animar("spr" + lado(def), "golpe", 350);
+      if (crit) await decir("¡Golpe crítico!");
+      await decir(`${def.nombre} pierde ${dano} PV.`);
+      if (def.pv <= 0){
+        $("spr" + lado(def)).classList.add("cae");
+        await decir(`¡${def.nombre} se debilita!`);
+        await decir(`¡${atk.nombre} gana el combate!`);
+        return atk;
+      }
+    }
+    turno ^= 1;
+  }
+}
+
+/* ---------- Eliminatoria ---------- */
+function nombreRonda(n){ return n === 2 ? "¡LA FINAL!" : n === 4 ? "SEMIFINALES" : n === 8 ? "CUARTOS DE FINAL" : null; }
+function pintarLlaves(emparejados, bye, jugado, actual){
+  const lista = $("lista"); lista.textContent = "";
+  const mk = l => { const s = document.createElement("div"); s.className = "lado"; const e = document.createElement("b"); e.textContent = emojiDe(l); e.style.fontWeight = 400; const n = document.createElement("span"); n.textContent = l.nombre; s.append(e, n); return s; };
+  emparejados.forEach(([x, y], i) => {
+    const d = document.createElement("div"); d.className = "duelo" + (i === actual ? " actual" : "");
+    const sx = mk(x), sy = mk(y), g = jugado[i];
+    if (g){ (g === x ? sx : sy).classList.add("gana"); (g === x ? sy : sx).classList.add("pierde"); }
+    const vs = document.createElement("span"); vs.className = "vs"; vs.textContent = "VS";
+    d.append(sx, vs, sy); lista.append(d);
+  });
+  if (bye){ const d = document.createElement("div"); d.className = "duelo bye"; const s = mk(bye); const t = document.createElement("span"); t.textContent = " pasa directo"; s.append(t); d.append(s); lista.append(d); }
+}
+
+let plantel = [];
+async function torneo(){
+  let vivos = barajar(plantel.map(l => ({...l}))), ronda = 1;
+  while (vivos.length > 1){
+    const bye = vivos.length % 2 ? vivos.shift() : null;
+    const par = []; for (let i = 0; i < vivos.length; i += 2) par.push([vivos[i], vivos[i + 1]]);
+    const total = vivos.length + (bye ? 1 : 0), jugado = [], ganadores = [];
+    mostrar("s-llaves");
+    $("ronda-titulo").textContent = nombreRonda(total) || `RONDA ${ronda}`;
+    $("ronda-sub").textContent = `${total} luchadores · ${par.length} combate${par.length > 1 ? "s" : ""}`;
+    for (let i = 0; i < par.length; i++){
+      mostrar("s-llaves"); pintarLlaves(par, bye, jugado, i);
+      $("llaves-pista").textContent = auto ? "" : "Espacio = siguiente combate";
+      await pausa(2200);
+      const g = await combate(par[i][0], par[i][1]);
+      jugado[i] = g; ganadores.push(g);
+    }
+    mostrar("s-llaves"); pintarLlaves(par, bye, jugado, -1); $("llaves-pista").textContent = auto ? "" : "Espacio = continuar";
+    await pausa(2200);
+    vivos = ganadores.concat(bye ? [bye] : []); ronda++;
+  }
+  const c = vivos[0];
+  $("c-emoji").textContent = emojiDe(c); $("c-nombre").textContent = c.nombre; $("c-grito").textContent = c.grito ? `«${c.grito}»` : "";
+  mostrar("s-campeon");
+}
+
+/* ---------- Carga de luchadores ---------- */
+function ficha(l){
+  const d = document.createElement("div"); d.className = "ficha";
+  const e = document.createElement("b"); e.textContent = emojiDe(l);
+  const s = document.createElement("span"); s.textContent = l.nombre;
+  const sm = document.createElement("small"); sm.textContent = `PV ${l.vida} · ATQ ${l.ataque}`; s.append(sm);
+  d.append(e, s); return d;
+}
+async function cargar(){
+  let datos = [], demo = false;
+  try { const r = await fetch("luchadores.json?t=" + Date.now()); if (!r.ok) throw 0; datos = await r.json(); } catch { datos = []; }
+  if (!Array.isArray(datos) || datos.length < 2){ datos = DEMO; demo = true; }
+  plantel = datos;
+  $("estado").textContent = demo ? `Modo demo: ${datos.length} luchadores de ejemplo` : `${datos.length} luchadores apuntados`;
+  const p = $("plantel"); p.textContent = ""; datos.slice(0, 16).forEach(l => p.append(ficha(l)));
+  if (datos.length > 16){ const m = document.createElement("div"); m.className = "ficha"; m.textContent = `… y ${datos.length - 16} más`; p.append(m); }
+}
+$("btn-empezar").onclick = () => torneo();
+$("btn-otra").onclick = () => { mostrar("s-inicio"); cargar(); };
+cargar().then(() => { if (params.has("rapido") && params.has("ya")) torneo(); });
+</script>
+</body>
+</html>
